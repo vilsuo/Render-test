@@ -1,26 +1,29 @@
-require('dotenv').config()
+// Defines the Mongoose schema for notes
+
+// Document databases like Mongo are schemaless, meaning that the
+// database itself does not care about the structure of the data that
+// is stored in the database. It is possible to store documents with
+// completely different fields in the same collection.
+//
+// The idea behind Mongoose is that the data stored in the database is
+// given a schema at the level of the application that defines the shape
+// of the documents stored in any given collection.
 const mongoose = require('mongoose')
 
-mongoose.set('strictQuery', false)
-
-const url = process.env.MONGODB_URI
-
-console.log('connecting to', url)
-
-mongoose.connect(url)
-  .then(result => {
-    console.log('connected to MongoDB')
-  })
-  .catch((error) => {
-    console.log('error connecting to MongoDB:', error.message)
-  })
-
+// Everything in Mongoose starts with a Schema. Each schema maps to a
+// MongoDB collection and defines the shape of the documents within that
+// collection.
+//
+// Each key in our noteSchema defines a property in our documents which
+// will be cast to its associated SchemaType
+//
+// Schema tells Mongoose how the note objects are to be stored in the
+// database.
 const noteSchema = new mongoose.Schema({
-  // define specific validation rules for content
   content: {
     type: String,
-    minLength: 5,
-    required: true
+    required: true,
+    minlength: 5
   },
   important: Boolean,
 })
@@ -33,12 +36,15 @@ noteSchema.set('toJSON', {
   }
 })
 
-// Defining Node modules differs slightly from the way of defining ES6 
-// modules
-
-// The public interface of the module is defined by setting a value to 
-// the module.exports variable. We will set the value to be the Note 
-// model. The other things defined inside of the module, like the 
-// variables mongoose and url will not be accessible or visible to users 
-// of the module.
+// A model is a class with which we construct document Instances of
+// Models are documents
+//
+// To use our schema definition, we need to convert our noteSchema into
+// a Model we can work with
+//
+// In the Note model definition, the first "Note" parameter is the
+// singular name of the model. The name of the collection will be the
+// lowercase plural notes, because the Mongoose convention is to
+// automatically name collections as the plural (e.g. notes) when the
+// schema refers to them in the singular
 module.exports = mongoose.model('Note', noteSchema)
